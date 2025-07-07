@@ -18,6 +18,9 @@ document.getElementById('copy-btn').addEventListener('click', async () => {
 
     await navigator.clipboard.write([clipboardItem]);
     alert("Copiado! Agora cole no Figma com ⌘+V");
+    console.log(`
+        <!--(figma)${base64Payload}(/figma)-->
+        `);
   } catch (err) {
     alert("Erro ao copiar: " + err);
   }
