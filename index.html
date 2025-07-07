@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Figma Real Clipboard Integration</title>
+    <title>Component Gallery - Copy to Figma</title>
     <style>
         * {
             margin: 0;
@@ -13,76 +13,91 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
+            background: #f8fafc;
+            color: #1a1a1a;
         }
 
         .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
             text-align: center;
-            margin-bottom: 30px;
         }
 
         .header h1 {
-            color: #1a1a1a;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .header p {
-            color: #666;
-            font-size: 16px;
+            font-size: 18px;
+            opacity: 0.9;
         }
 
-        .frame-preview {
-            width: 200px;
-            height: 200px;
-            border: 3px solid #18a0fb;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .component-card {
             background: white;
-            margin: 20px auto;
-            border-radius: 8px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .component-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #18a0fb;
+        }
+
+        .component-preview {
+            height: 200px;
+            background: #f8f9fa;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            box-shadow: 0 4px 12px rgba(24, 160, 251, 0.2);
+            border-bottom: 1px solid #e9ecef;
         }
 
-        .frame-preview::before {
-            content: "1000×1000";
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #18a0fb;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
+        .component-content {
+            padding: 20px;
         }
 
-        .frame-preview-text {
+        .component-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .component-description {
             color: #666;
             font-size: 14px;
-            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 16px;
         }
 
-        .copy-section {
-            margin: 30px 0;
+        .component-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: #888;
         }
 
         .copy-button {
@@ -90,24 +105,19 @@
             background: linear-gradient(45deg, #18a0fb, #1e88e5);
             color: white;
             border: none;
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-size: 16px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin: 10px 0;
             position: relative;
             overflow: hidden;
         }
 
         .copy-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(24, 160, 251, 0.3);
-        }
-
-        .copy-button:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(24, 160, 251, 0.3);
         }
 
         .copy-button:disabled {
@@ -117,373 +127,476 @@
             box-shadow: none;
         }
 
+        .copy-button.success {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+        }
+
         .copy-button .icon {
             margin-right: 8px;
         }
 
-        .status-message {
-            margin-top: 20px;
-            padding: 16px;
+        /* Componente específico styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+            padding: 12px 24px;
             border-radius: 8px;
             font-weight: 500;
-            text-align: center;
-            transition: all 0.3s ease;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .status-success {
-            background: #e8f5e8;
-            color: #2e7d2e;
-            border: 1px solid #c3e6c3;
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
         }
 
-        .status-error {
-            background: #fdf2f2;
-            color: #d63447;
-            border: 1px solid #f5c6cb;
+        .input-field:focus {
+            outline: none;
+            border-color: #18a0fb;
+        }
+
+        .card-sample {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 200px;
+        }
+
+        .badge {
+            background: #18a0fb;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: #f44336;
         }
 
         .instructions {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
 
         .instructions h3 {
             color: #1a1a1a;
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
             margin-bottom: 12px;
-            font-size: 18px;
+            font-size: 16px;
         }
 
-        .instructions ol {
-            color: #555;
-            line-height: 1.6;
-            padding-left: 20px;
-        }
-
-        .instructions li {
-            margin-bottom: 8px;
-        }
-
-        .tech-info {
-            background: #f0f7ff;
-            border: 1px solid #b3d9ff;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 20px;
-        }
-
-        .tech-info h4 {
-            color: #0066cc;
-            margin-bottom: 8px;
-            font-size: 14px;
+        .step-number {
+            background: #18a0fb;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
             font-weight: 600;
+            margin-right: 12px;
         }
 
-        .tech-info p {
-            color: #555;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-
-        .loading {
-            animation: pulse 1.5s infinite;
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎨 Figma Real Clipboard</h1>
-            <p>Copy elementos diretamente para o Figma usando dados reais</p>
-        </div>
+    <div class="header">
+        <h1>🎨 Component Gallery</h1>
+        <p>Copy componentes direto para o Figma</p>
+    </div>
 
-        <div class="frame-preview">
-            <div class="frame-preview-text">
-                Frame Branco<br>
-                <small>Com stroke e propriedades reais</small>
+    <div class="container">
+        <div class="instructions">
+            <h3>📋 Como usar:</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                Clique em "Copy to Figma" no componente desejado
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                Abra o Figma no seu navegador
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                Pressione <strong>Ctrl+V</strong> (ou Cmd+V no Mac)
+            </div>
+            <div class="step">
+                <span class="step-number">4</span>
+                Edite o componente como qualquer elemento nativo do Figma!
             </div>
         </div>
 
-        <div class="copy-section">
-            <button class="copy-button" onclick="copyRealFrame()">
-                <span class="icon">📋</span>
-                Copy Frame Real para Figma
-            </button>
-            
-            <button class="copy-button" onclick="copySimpleFrame()">
-                <span class="icon">⚡</span>
-                Copy Frame Simplificado
-            </button>
-        </div>
-
-        <div id="statusMessage" class="hidden"></div>
-
-        <div class="instructions">
-            <h3>📝 Como usar:</h3>
-            <ol>
-                <li>Clique em um dos botões de copy acima</li>
-                <li>Abra o Figma no seu navegador</li>
-                <li>Pressione <strong>Ctrl+V</strong> (ou Cmd+V no Mac)</li>
-                <li>Veja o frame aparecer no canvas!</li>
-            </ol>
-        </div>
-
-        <div class="tech-info">
-            <h4>🔧 Implementação Técnica</h4>
-            <p>Esta implementação usa os dados reais do Node Decoder, convertidos para o formato kiwi que o Figma espera no clipboard. Os dados incluem dimensões, fills, strokes e todas as propriedades exatas do frame original.</p>
+        <div class="gallery-grid" id="componentGallery">
+            <!-- Os componentes serão inseridos aqui via JavaScript -->
         </div>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
-        // Dados reais extraídos do Node Decoder
-        const REAL_FRAME_DATA = {
-            type: "FRAME",
-            width: 1000.0,
-            height: 971.0144653320,
-            name: "exemplo-de-frame",
-            relativeTransform: [[1,0,-431],[0,1,-418.507232666]],
-            x: -431,
-            y: -418.5072326660156,
-            fills: [{
-                type: "SOLID",
-                visible: true,
-                opacity: 1,
-                blendMode: "NORMAL",
-                color: { r: 1, g: 1, b: 1 },
-                boundVariables: {}
-            }],
-            strokeWeight: 7.2463765144348145,
-            strokeTopWeight: 7.2463765144348145,
-            strokeBottomWeight: 7.2463765144348145,
-            strokeLeftWeight: 7.2463765144348145,
-            strokeRightWeight: 7.2463765144348145,
-            primaryAxisSizingMode: "AUTO"
-        };
-
-        // Função para gerar metadata do Figma
-        function generateFigmaMetadata() {
-            const metadata = {
-                fileKey: `external-${Date.now()}`,
-                pasteID: Date.now(),
-                dataType: "scene"
-            };
-            return btoa(JSON.stringify(metadata));
-        }
-
-        // Função para simular encoding kiwi (baseado na pesquisa)
-        function encodeToKiwi(frameData) {
-            // Esta é uma simulação do formato kiwi baseada na pesquisa
-            // Em produção, seria necessária uma implementação completa do encoder
-            
-            const kiwiHeader = "fig-kiwi0"; // Header padrão do formato
-            const version = new Uint8Array([0, 0, 0, 1]); // Versão
-            
-            // Serializar dados do frame para JSON e depois para bytes
-            const jsonData = JSON.stringify(frameData);
-            const textEncoder = new TextEncoder();
-            const jsonBytes = textEncoder.encode(jsonData);
-            
-            // Simular estrutura kiwi básica
-            const totalLength = kiwiHeader.length + version.length + jsonBytes.length;
-            const kiwiData = new Uint8Array(totalLength);
-            
-            let offset = 0;
-            
-            // Header
-            kiwiData.set(textEncoder.encode(kiwiHeader), offset);
-            offset += kiwiHeader.length;
-            
-            // Versão
-            kiwiData.set(version, offset);
-            offset += version.length;
-            
-            // Dados JSON
-            kiwiData.set(jsonBytes, offset);
-            
-            // Converter para base64
-            let binary = '';
-            for (let i = 0; i < kiwiData.length; i++) {
-                binary += String.fromCharCode(kiwiData[i]);
+        // Database de componentes (aqui você colocaria os dados dos seus frames do Figma)
+        const components = [
+            {
+                id: 'btn-primary',
+                name: 'Primary Button',
+                description: 'Botão principal com gradiente e hover effects',
+                category: 'Buttons',
+                width: 160,
+                height: 48,
+                figmaData: {
+                    type: "FRAME",
+                    name: "Primary Button",
+                    width: 160,
+                    height: 48,
+                    fills: [{
+                        type: "GRADIENT_LINEAR",
+                        gradientStops: [
+                            {color: {r: 0.4, g: 0.494, b: 0.918}, position: 0},
+                            {color: {r: 0.463, g: 0.294, b: 0.635}, position: 1}
+                        ]
+                    }],
+                    cornerRadius: 8,
+                    children: [{
+                        type: "TEXT",
+                        characters: "Primary Button",
+                        fontSize: 14,
+                        fontName: {family: "Inter", style: "SemiBold"},
+                        fills: [{type: "SOLID", color: {r: 1, g: 1, b: 1}}]
+                    }]
+                },
+                preview: '<button class="btn-primary">Primary Button</button>'
+            },
+            {
+                id: 'btn-secondary',
+                name: 'Secondary Button',
+                description: 'Botão secundário com border e hover',
+                category: 'Buttons',
+                width: 160,
+                height: 48,
+                figmaData: {
+                    type: "FRAME",
+                    name: "Secondary Button",
+                    width: 160,
+                    height: 48,
+                    fills: [{type: "SOLID", color: {r: 1, g: 1, b: 1}}],
+                    strokes: [{type: "SOLID", color: {r: 0.875, g: 0.875, b: 0.875}}],
+                    strokeWeight: 2,
+                    cornerRadius: 8,
+                    children: [{
+                        type: "TEXT",
+                        characters: "Secondary Button",
+                        fontSize: 14,
+                        fontName: {family: "Inter", style: "Medium"},
+                        fills: [{type: "SOLID", color: {r: 0.2, g: 0.2, b: 0.2}}]
+                    }]
+                },
+                preview: '<button class="btn-secondary">Secondary Button</button>'
+            },
+            {
+                id: 'input-field',
+                name: 'Input Field',
+                description: 'Campo de input com estados focus e placeholder',
+                category: 'Forms',
+                width: 280,
+                height: 48,
+                figmaData: {
+                    type: "FRAME",
+                    name: "Input Field",
+                    width: 280,
+                    height: 48,
+                    fills: [{type: "SOLID", color: {r: 1, g: 1, b: 1}}],
+                    strokes: [{type: "SOLID", color: {r: 0.875, g: 0.875, b: 0.875}}],
+                    strokeWeight: 2,
+                    cornerRadius: 8,
+                    children: [{
+                        type: "TEXT",
+                        characters: "Enter your email...",
+                        fontSize: 14,
+                        fontName: {family: "Inter", style: "Regular"},
+                        fills: [{type: "SOLID", color: {r: 0.6, g: 0.6, b: 0.6}}]
+                    }]
+                },
+                preview: '<input class="input-field" placeholder="Enter your email..." />'
+            },
+            {
+                id: 'card',
+                name: 'Card Component',
+                description: 'Card com shadow e border radius',
+                category: 'Layout',
+                width: 200,
+                height: 120,
+                figmaData: {
+                    type: "FRAME",
+                    name: "Card Component",
+                    width: 200,
+                    height: 120,
+                    fills: [{type: "SOLID", color: {r: 1, g: 1, b: 1}}],
+                    cornerRadius: 12,
+                    effects: [{
+                        type: "DROP_SHADOW",
+                        color: {r: 0, g: 0, b: 0, a: 0.1},
+                        offset: {x: 0, y: 2},
+                        radius: 8
+                    }],
+                    children: [{
+                        type: "TEXT",
+                        characters: "Card Title",
+                        fontSize: 16,
+                        fontName: {family: "Inter", style: "SemiBold"},
+                        fills: [{type: "SOLID", color: {r: 0.1, g: 0.1, b: 0.1}}]
+                    }]
+                },
+                preview: '<div class="card-sample"><h4>Card Title</h4><p>Card content here</p></div>'
+            },
+            {
+                id: 'badge',
+                name: 'Badge',
+                description: 'Badge para status, tags e labels',
+                category: 'Indicators',
+                width: 80,
+                height: 28,
+                figmaData: {
+                    type: "FRAME",
+                    name: "Badge",
+                    width: 80,
+                    height: 28,
+                    fills: [{type: "SOLID", color: {r: 0.094, g: 0.627, b: 0.984}}],
+                    cornerRadius: 16,
+                    children: [{
+                        type: "TEXT",
+                        characters: "Badge",
+                        fontSize: 12,
+                        fontName: {family: "Inter", style: "Medium"},
+                        fills: [{type: "SOLID", color: {r: 1, g: 1, b: 1}}]
+                    }]
+                },
+                preview: '<span class="badge">Badge</span>'
             }
+        ];
+
+        // Função para gerar SVG do componente
+        function generateComponentSVG(component) {
+            const { width, height, figmaData } = component;
             
-            return btoa(binary);
-        }
-
-        // Função para criar HTML do clipboard Figma
-        function createFigmaClipboardHTML(metadata, binaryData, fallbackText) {
-            return `<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-</head>
-<body>
-<!--StartFragment-->
-<meta charset="utf-8">
-<!--(figmeta)${metadata}(/figmeta)-->
-<!--(figma)${binaryData}(/figma)-->
-<span style="white-space:pre-wrap;">${fallbackText}</span>
-<!--EndFragment-->
-</body>
-</html>`;
-        }
-
-        // Função para copiar para clipboard
-        async function copyToClipboard(htmlContent) {
-            try {
-                const blob = new Blob([htmlContent], { type: 'text/html' });
-                const clipboardItem = new ClipboardItem({
-                    'text/html': blob
-                });
+            // Converter dados do Figma para SVG
+            let svgContent = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+            
+            // Background do frame
+            const fill = figmaData.fills?.[0];
+            let fillColor = 'white';
+            
+            if (fill?.type === 'SOLID') {
+                const {r, g, b} = fill.color;
+                fillColor = `rgb(${Math.round(r*255)}, ${Math.round(g*255)}, ${Math.round(b*255)})`;
+            } else if (fill?.type === 'GRADIENT_LINEAR') {
+                const stops = fill.gradientStops.map(stop => {
+                    const {r, g, b} = stop.color;
+                    return `rgb(${Math.round(r*255)}, ${Math.round(g*255)}, ${Math.round(b*255)}) ${stop.position * 100}%`;
+                }).join(', ');
+                fillColor = `linear-gradient(135deg, ${stops})`;
                 
-                await navigator.clipboard.write([clipboardItem]);
-                return { success: true };
-            } catch (error) {
-                console.error('Clipboard error:', error);
-                return { success: false, error: error.message };
+                // Para SVG, precisamos usar defs
+                svgContent += `
+                <defs>
+                    <linearGradient id="grad${component.id}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        ${fill.gradientStops.map((stop, i) => {
+                            const {r, g, b} = stop.color;
+                            return `<stop offset="${stop.position * 100}%" style="stop-color:rgb(${Math.round(r*255)}, ${Math.round(g*255)}, ${Math.round(b*255)})"/>`;
+                        }).join('')}
+                    </linearGradient>
+                </defs>`;
+                fillColor = `url(#grad${component.id})`;
             }
-        }
-
-        // Função para mostrar status
-        function showStatus(message, isSuccess = true) {
-            const statusEl = document.getElementById('statusMessage');
-            statusEl.className = `status-message ${isSuccess ? 'status-success' : 'status-error'}`;
-            statusEl.textContent = message;
-            statusEl.classList.remove('hidden');
             
-            setTimeout(() => {
-                statusEl.classList.add('hidden');
-            }, 5000);
+            // Stroke
+            let strokeProps = '';
+            if (figmaData.strokes?.length > 0) {
+                const stroke = figmaData.strokes[0];
+                const {r, g, b} = stroke.color;
+                const strokeColor = `rgb(${Math.round(r*255)}, ${Math.round(g*255)}, ${Math.round(b*255)})`;
+                strokeProps = `stroke="${strokeColor}" stroke-width="${figmaData.strokeWeight || 1}"`;
+            }
+            
+            // Rect principal
+            const cornerRadius = figmaData.cornerRadius || 0;
+            svgContent += `<rect width="${width}" height="${height}" fill="${fillColor}" ${strokeProps} rx="${cornerRadius}"/>`;
+            
+            // Adicionar texto se existir
+            if (figmaData.children?.length > 0) {
+                const textChild = figmaData.children.find(child => child.type === 'TEXT');
+                if (textChild) {
+                    const textFill = textChild.fills?.[0];
+                    let textColor = 'black';
+                    if (textFill?.type === 'SOLID') {
+                        const {r, g, b} = textFill.color;
+                        textColor = `rgb(${Math.round(r*255)}, ${Math.round(g*255)}, ${Math.round(b*255)})`;
+                    }
+                    
+                    svgContent += `
+                    <text x="${width/2}" y="${height/2}" 
+                          text-anchor="middle" 
+                          dominant-baseline="middle" 
+                          fill="${textColor}" 
+                          font-size="${textChild.fontSize || 14}" 
+                          font-weight="${textChild.fontName?.style === 'SemiBold' ? '600' : textChild.fontName?.style === 'Medium' ? '500' : '400'}"
+                          font-family="Inter, sans-serif">
+                        ${textChild.characters}
+                    </text>`;
+                }
+            }
+            
+            // Adicionar metadata para o Figma
+            svgContent += `
+            <metadata>
+                <figma:component name="${figmaData.name}" data='${JSON.stringify(figmaData)}'/>
+            </metadata>
+            </svg>`;
+            
+            return svgContent;
         }
 
-        // Copy frame com dados reais do Node Decoder
-        async function copyRealFrame() {
-            const button = event.target;
+        // Função para copiar componente
+        async function copyComponent(componentId) {
+            const component = components.find(c => c.id === componentId);
+            const button = document.querySelector(`[data-component="${componentId}"] .copy-button`);
             const originalText = button.innerHTML;
             
-            button.disabled = true;
-            button.innerHTML = '<span class="icon">⏳</span> Gerando dados...';
-            button.classList.add('loading');
-            
             try {
-                // Gerar metadata
-                const metadata = generateFigmaMetadata();
+                button.disabled = true;
+                button.innerHTML = '<span class="icon">⏳</span> Gerando...';
                 
-                // Simular delay de processamento
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // Gerar SVG
+                const svgContent = generateComponentSVG(component);
                 
                 button.innerHTML = '<span class="icon">📋</span> Copiando...';
                 
-                // Encoding dos dados reais
-                const binaryData = encodeToKiwi(REAL_FRAME_DATA);
-                
-                // Criar HTML do clipboard
-                const clipboardHTML = createFigmaClipboardHTML(
-                    metadata,
-                    binaryData,
-                    `Frame Real 1000×971 - ${REAL_FRAME_DATA.name}`
-                );
-                
                 // Copiar para clipboard
-                const result = await copyToClipboard(clipboardHTML);
+                await navigator.clipboard.writeText(svgContent);
                 
-                if (result.success) {
-                    showStatus('✅ Frame real copiado! Cole no Figma com Ctrl+V', true);
-                } else {
-                    showStatus(`❌ Erro ao copiar: ${result.error}`, false);
-                }
+                button.innerHTML = '<span class="icon">✅</span> Copiado!';
+                button.classList.add('success');
                 
-            } catch (error) {
-                showStatus(`❌ Erro inesperado: ${error.message}`, false);
-            } finally {
-                button.disabled = false;
-                button.innerHTML = originalText;
-                button.classList.remove('loading');
-            }
-        }
-
-        // Copy frame simplificado
-        async function copySimpleFrame() {
-            const button = event.target;
-            const originalText = button.innerHTML;
-            
-            button.disabled = true;
-            button.innerHTML = '<span class="icon">⏳</span> Processando...';
-            
-            try {
-                const simpleFrame = {
-                    type: "FRAME",
-                    width: 1000,
-                    height: 1000,
-                    name: "Simple White Frame",
-                    fills: [{
-                        type: "SOLID",
-                        visible: true,
-                        opacity: 1,
-                        color: { r: 1, g: 1, b: 1 }
-                    }]
-                };
-                
-                const metadata = generateFigmaMetadata();
-                const binaryData = encodeToKiwi(simpleFrame);
-                
-                const clipboardHTML = createFigmaClipboardHTML(
-                    metadata,
-                    binaryData,
-                    "Simple Frame 1000×1000"
-                );
-                
-                const result = await copyToClipboard(clipboardHTML);
-                
-                if (result.success) {
-                    showStatus('✅ Frame simplificado copiado! Cole no Figma com Ctrl+V', true);
-                } else {
-                    showStatus(`❌ Erro ao copiar: ${result.error}`, false);
-                }
+                showToast(`✅ ${component.name} copiado! Cole no Figma com Ctrl+V`, 'success');
                 
             } catch (error) {
-                showStatus(`❌ Erro: ${error.message}`, false);
+                showToast(`❌ Erro ao copiar ${component.name}`, 'error');
+                console.error('Erro:', error);
             } finally {
-                button.disabled = false;
-                button.innerHTML = originalText;
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                    button.classList.remove('success');
+                }, 3000);
             }
         }
 
-        // Verificar suporte do navegador
-        function checkBrowserSupport() {
-            if (!navigator.clipboard || !navigator.clipboard.write) {
-                showStatus('❌ Seu navegador não suporta a Clipboard API necessária', false);
-                document.querySelectorAll('.copy-button').forEach(btn => {
-                    btn.disabled = true;
-                    btn.innerHTML = '<span class="icon">❌</span> Navegador não suportado';
-                });
-                return false;
-            }
+        // Função para mostrar toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
             
-            if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-                showStatus('⚠️ Para máxima compatibilidade, use HTTPS', false);
-            }
-            
-            return true;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000);
         }
 
-        // Inicializar quando carregar
+        // Renderizar galeria
+        function renderGallery() {
+            const gallery = document.getElementById('componentGallery');
+            
+            gallery.innerHTML = components.map(component => `
+                <div class="component-card" data-component="${component.id}">
+                    <div class="component-preview">
+                        ${component.preview}
+                    </div>
+                    <div class="component-content">
+                        <h3 class="component-title">${component.name}</h3>
+                        <p class="component-description">${component.description}</p>
+                        <div class="component-meta">
+                            <span>📁 ${component.category}</span>
+                            <span>📐 ${component.width}×${component.height}</span>
+                        </div>
+                        <button class="copy-button" onclick="copyComponent('${component.id}')">
+                            <span class="icon">📋</span>
+                            Copy to Figma
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Inicializar
         document.addEventListener('DOMContentLoaded', () => {
-            checkBrowserSupport();
+            renderGallery();
+            
+            // Verificar suporte
+            if (!navigator.clipboard) {
+                showToast('⚠️ Clipboard API limitada. Use HTTPS para melhor funcionamento.', 'error');
+            }
         });
 
-        // Log para debugging
-        console.log('Figma Real Clipboard Demo carregado');
-        console.log('Dados do frame:', REAL_FRAME_DATA);
+        console.log('🎨 Component Gallery carregada');
+        console.log('💡 Componentes disponíveis:', components.length);
     </script>
 </body>
 </html>
