@@ -1,50 +1,49 @@
 
 
-    async function copyToClipboard() {
+
+
+
+
+      async function copyToClipboard() {
         try {
           const response = await fetch('card.base64.txt');
           const base64 = await response.text();
       
-          // HTML com o span que o Figma reconhece
-          const htmlContent = `
-            <span 
-              data-buffer="<!--(figma)${base64}(/figma)-->" 
-              contenteditable="true" 
-              style="white-space: pre"
-            >
-              Copied Component
-            </span>
-          `;
-      
           const hiddenDiv = document.getElementById('hidden-copy');
-          hiddenDiv.innerHTML = htmlContent;
+          hiddenDiv.innerHTML = ''; // Limpa antes
       
-          // Seleciona o conteúdo da div
+          // Cria o span com o conteúdo que o Figma entende
+          const span = document.createElement('span');
+          span.setAttribute('data-buffer', `<!--(figma)${base64}(/figma)-->`);
+          span.setAttribute('contenteditable', 'true');
+          span.setAttribute('style', 'white-space: pre');
+          span.textContent = 'Copied Component';
+      
+          hiddenDiv.appendChild(span);
+      
+          // Seleciona exatamente o span
           const range = document.createRange();
-          range.selectNode(hiddenDiv);
+          range.selectNode(span);
           const selection = window.getSelection();
           selection.removeAllRanges();
           selection.addRange(range);
       
-          // Copia para a área de transferência
+          // Executa o comando de cópia
           const success = document.execCommand('copy');
       
+          selection.removeAllRanges();
+      
           if (success) {
-            
-            alert('Copiado! Agora vá ao Figma Desktop e cole com ⌘+V');
+            alert('✅ Copiado! Agora cole no Figma com ⌘+V');
             console.log(`
                 <!--(figma)${base64}(/figma)-->
                 `);
-
                 
           } else {
-            alert('Falha ao copiar.');
+            alert('❌ Falha ao copiar.');
           }
-      
-          // Limpa a seleção
-          selection.removeAllRanges();
         } catch (err) {
-          alert('Erro ao copiar: ' + err.message);
+          alert('Erro: ' + err.message);
         }
       }
       
