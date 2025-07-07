@@ -35,15 +35,53 @@
       
           if (success) {
             alert('✅ Copiado! Agora cole no Figma com ⌘+V');
-            console.log(`
-                <!--(figma)${base64}(/figma)-->
-                `);
+        
                 
           } else {
             alert('❌ Falha ao copiar.');
           }
         } catch (err) {
           alert('Erro: ' + err.message);
+        }
+      }
+      
+
+
+
+
+
+
+
+
+      async function copyToClipboard() {
+        try {
+          const response = await fetch('card.base64.txt');
+          const base64 = await response.text();
+      
+          const html = `
+            <span 
+              data-buffer="<!--(figma)${base64}(/figma)-->" 
+              contenteditable="true" 
+              style="white-space: pre"
+            >
+              Copied Component
+            </span>
+          `;
+      
+          const blob = new Blob([html], { type: 'text/html' });
+          const clipboardItem = new ClipboardItem({ 'text/html': blob });
+      
+          await navigator.clipboard.write([clipboardItem]);
+      
+          alert("✅ Copiado! Agora cole no Figma com ⌘+V");
+
+          console.log(`
+            <!--(figma)${base64}(/figma)-->
+            `);
+
+            
+        } catch (err) {
+          alert("❌ Erro ao copiar: " + err.message);
         }
       }
       
