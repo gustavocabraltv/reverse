@@ -1,87 +1,33 @@
-
-
-
-
-
-
-      async function copyToClipboard() {
-        try {
-          const response = await fetch('card.base64.txt');
-          const base64 = await response.text();
-      
-          const hiddenDiv = document.getElementById('hidden-copy');
-          hiddenDiv.innerHTML = ''; // Limpa antes
-      
-          // Cria o span com o conteúdo que o Figma entende
-          const span = document.createElement('span');
-          span.setAttribute('data-buffer', `<!--(figma)${base64}(/figma)-->`);
-          span.setAttribute('contenteditable', 'true');
-          span.setAttribute('style', 'white-space: pre');
-          span.textContent = 'Copied Component';
-      
-          hiddenDiv.appendChild(span);
-      
-          // Seleciona exatamente o span
-          const range = document.createRange();
-          range.selectNode(span);
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(range);
-      
-          // Executa o comando de cópia
-          const success = document.execCommand('copy');
-      
-          selection.removeAllRanges();
-      
-          if (success) {
-            alert('✅ Copiado! Agora cole no Figma com ⌘+V');
-        
-                
-          } else {
-            alert('❌ Falha ao copiar.');
-          }
-        } catch (err) {
-          alert('Erro: ' + err.message);
-        }
-      }
-      
-
-
-
-
-
-
-
-
-      async function copyToClipboard() {
-        try {
-          const response = await fetch('card.base64.txt');
-          const base64 = await response.text();
-      
-          const html = `
-            <span 
-              data-buffer="<!--(figma)${base64}(/figma)-->" 
-              contenteditable="true" 
-              style="white-space: pre"
-            >
-              Copied Component
-            </span>
-          `;
-      
-          const blob = new Blob([html], { type: 'text/html' });
-          const clipboardItem = new ClipboardItem({ 'text/html': blob });
-      
-          await navigator.clipboard.write([clipboardItem]);
-      
-          alert("✅ Copiado! Agora cole no Figma com ⌘+V");
-
-          console.log(`
-            <!--(figma)${base64}(/figma)-->
-            `);
-
-            
-        } catch (err) {
-          alert("❌ Erro ao copiar: " + err.message);
-        }
-      }
-      
+async function copyToClipboard() {
+    try {
+      const response = await fetch('card.base64.txt');
+      const base64 = await response.text();
+  
+      const figmaPayload = `<!--(figma)${base64}(/figma)-->`;
+  
+      const html = `
+        <span 
+          data-buffer="${figmaPayload}" 
+          contenteditable="true" 
+          style="white-space: pre"
+        >
+          Copied Component
+        </span>
+      `;
+  
+      const plainBlob = new Blob([figmaPayload], { type: 'text/plain' });
+      const htmlBlob = new Blob([html], { type: 'text/html' });
+  
+      const clipboardItem = new ClipboardItem({
+        'text/plain': plainBlob,
+        'text/html': htmlBlob
+      });
+  
+      await navigator.clipboard.write([clipboardItem]);
+  
+      alert("✅ Copiado! Agora cole no Figma com ⌘+V");
+    } catch (err) {
+      alert("❌ Erro ao copiar: " + err.message);
+    }
+  }
+  
