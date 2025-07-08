@@ -1,14 +1,14 @@
 async function copyToClipboard() {
     try {
-      const response = await fetch('card.base64.txt');
-      const base64 = await response.text();
+      const response = await fetch('card.json');
+      const json = await response.json();
+      const jsonString = JSON.stringify(json);
   
-      const figmaPayload = `<!--(figma)${base64}(/figma)-->`;
-  
+      const figmaPayload = `<!--(figma)${jsonString}(/figma)-->`;
       const html = `
-        <span 
-          data-buffer="${figmaPayload}" 
-          contenteditable="true" 
+        <span
+          data-buffer="${figmaPayload}"
+          contenteditable="true"
           style="white-space: pre"
         >
           Copied Component
@@ -24,7 +24,6 @@ async function copyToClipboard() {
       });
   
       await navigator.clipboard.write([clipboardItem]);
-  
       alert("✅ Copiado! Agora cole no Figma com ⌘+V");
     } catch (err) {
       alert("❌ Erro ao copiar: " + err.message);
