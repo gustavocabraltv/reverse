@@ -1,16 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Incorporação do Figma</title>
+  <title>Copy to Figma</title>
+  <style>
+    #hidden-copy {
+      position: absolute;
+      left: -9999px;
+      white-space: pre;
+    }
+  </style>
 </head>
 <body>
-  <h1>Design do Figma</h1>
-  <!-- Embed do Figma -->
-  <iframe style="border: 1px solid rgba(0, 0, 0, 0.1);" width="800" height="450" 
-          src="https://embed.figma.com/design/N70fO05S4DMBUo0BV5m6b4/component-shadcn?node-id=0-1&embed-host=share" 
-          allowfullscreen>
-  </iframe>
+  <h1>Copiar Componente para o Figma</h1>
+  <button onclick="copyToFigma()">Copy to Figma</button>
+
+  <div id="hidden-copy" contenteditable="true"></div>
+
+  <script src="script.js"></script>
 </body>
 </html>

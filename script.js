@@ -1,32 +1,32 @@
-async function copyToClipboard() {
-    try {
-      const response = await fetch('card.json');
-      const json = await response.json();
-      const jsonString = JSON.stringify(json);
-  
-      const figmaPayload = `<!--(figma)${jsonString}(/figma)-->`;
-      const html = `
-        <span
-          data-buffer="${figmaPayload}"
-          contenteditable="true"
-          style="white-space: pre"
-        >
-          Copied Component
-        </span>
-      `;
-  
-      const plainBlob = new Blob([figmaPayload], { type: 'text/plain' });
-      const htmlBlob = new Blob([html], { type: 'text/html' });
-  
-      const clipboardItem = new ClipboardItem({
-        'text/plain': plainBlob,
-        'text/html': htmlBlob
-      });
-  
-      await navigator.clipboard.write([clipboardItem]);
-      alert("✅ Copiado! Agora cole no Figma com ⌘+V");
-    } catch (err) {
-      alert("❌ Erro ao copiar: " + err.message);
-    }
+async function copyToFigma() {
+  try {
+    // 1. Carrega o JSON do componente
+    const res = await fetch('card.json');
+    const json = await res.json();
+
+    // 2. Serializa e converte para UTF-8 + base64
+    const jsonStr = JSON.stringify(json);
+    const utf8Str = unescape(encodeURIComponent(jsonStr));
+    const base64 = btoa(utf8Str);
+
+    // 3. Monta o payload do Figma
+    const figmaPayload = `<!--(figma)${base64}(/figma)-->`;
+
+    // 4. Insere no DOM invisível
+    const el = document.getElementById('hidden-copy');
+    el.textContent = figmaPayload;
+
+    // 5. Seleciona o conteúdo
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    // 6. Executa cópia
+    const success = document.execCommand('copy');
+    alert(success ? "✅ Copiado! Cole no Figma com ⌘+V" : "❌ Falha ao copiar");
+  } catch (err) {
+    alert("❌ Erro: " + err.message);
   }
-  
+}
