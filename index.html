@@ -3,468 +3,776 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Copy to Figma - Teste de Múltiplas Abordagens</title>
+    <title>Copy to Figma - Implementação</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
-            background: #f8f9fa;
-            line-height: 1.6;
         }
-        
+
         .container {
+            max-width: 1200px;
+            margin: 0 auto;
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
-        
-        h1 {
-            color: #333;
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
             text-align: center;
-            margin-bottom: 30px;
         }
-        
-        .method {
-            margin-bottom: 25px;
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .component-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .component-card {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .component-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .component-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .component-preview {
+            background: white;
+            border-radius: 12px;
             padding: 20px;
-            border: 1px solid #e1e5e9;
-            border-radius: 8px;
-            background: #fafbfc;
+            margin-bottom: 20px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e9ecef;
         }
-        
-        .method h3 {
-            color: #0066cc;
-            margin-top: 0;
+
+        .component-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
         }
-        
-        .method p {
+
+        .component-info p {
             color: #666;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
-        
-        button {
-            background: #0066cc;
+
+        .copy-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.2s;
-            margin-right: 10px;
-        }
-        
-        button:hover {
-            background: #0052a3;
-        }
-        
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
-        .result {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 12px;
-        }
-        
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        
-        .hidden-elements {
-            position: absolute;
-            left: -9999px;
-            white-space: pre;
-        }
-        
-        .inspector {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f1f3f4;
             border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .inspector h3 {
-            margin-top: 0;
+
+        .copy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .copy-button:active {
+            transform: translateY(0);
+        }
+
+        .copy-button.copied {
+            background: #28a745;
+        }
+
+        .copy-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.6s ease;
+        }
+
+        .copy-button.ripple::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Componentes de exemplo */
+        .button-preview {
+            background: #007AFF;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .card-preview {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-weight: bold;
+            margin-bottom: 8px;
             color: #333;
         }
-        
-        .inspector textarea {
-            width: 100%;
-            height: 200px;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 11px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
+
+        .card-text {
+            color: #666;
+            font-size: 14px;
         }
-        
+
+        .input-preview {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .input-preview:focus {
+            outline: none;
+            border-color: #007AFF;
+        }
+
+        .badge-preview {
+            background: #28a745;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .toggle-preview {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #007AFF;
+            border-radius: 13px;
+            cursor: pointer;
+        }
+
+        .toggle-preview::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .avatar-preview {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
         .status {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
-            padding: 10px 15px;
-            border-radius: 6px;
+            background: #333;
             color: white;
-            font-weight: 500;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
             z-index: 1000;
-            display: none;
         }
-        
+
         .status.show {
-            display: block;
+            opacity: 1;
         }
-        
+
         .status.success {
             background: #28a745;
         }
-        
+
         .status.error {
             background: #dc3545;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .instructions h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+            color: #333;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧠 Teste: Copy to Figma</h1>
-        <p style="text-align: center; color: #666;">
-            Implementação de múltiplas abordagens para copiar componentes para o Figma
-        </p>
-        
-        <!-- Método 1: ClipboardItem com MIME types específicos -->
-        <div class="method">
-            <h3>Método 1: ClipboardItem com MIME Customizado</h3>
-            <p>Usa ClipboardItem com text/html e application/figma-node personalizado</p>
-            <button onclick="copyMethod1()">Testar Método 1</button>
-            <div id="result1" class="result" style="display: none;"></div>
+        <div class="header">
+            <h1>🎨 Copy to Figma</h1>
+            <p>Componentes prontos para usar no Figma</p>
         </div>
-        
-        <!-- Método 2: execCommand com seleção -->
-        <div class="method">
-            <h3>Método 2: execCommand com Seleção Manual</h3>
-            <p>Usa document.execCommand('copy') após selecionar elemento DOM</p>
-            <button onclick="copyMethod2()">Testar Método 2</button>
-            <div id="result2" class="result" style="display: none;"></div>
-        </div>
-        
-        <!-- Método 3: Clipboard API avançado -->
-        <div class="method">
-            <h3>Método 3: Multi-MIME com Data URLs</h3>
-            <p>Combina text/html, text/plain e data URLs</p>
-            <button onclick="copyMethod3()">Testar Método 3</button>
-            <div id="result3" class="result" style="display: none;"></div>
-        </div>
-        
-        <!-- Método 4: Simulação de origem Figma -->
-        <div class="method">
-            <h3>Método 4: Headers e Metadata Figma</h3>
-            <p>Simula headers e metadata que o Figma pode esperar</p>
-            <button onclick="copyMethod4()">Testar Método 4</button>
-            <div id="result4" class="result" style="display: none;"></div>
-        </div>
-        
-        <!-- Método 5: Abordagem híbrida -->
-        <div class="method">
-            <h3>Método 5: Abordagem Híbrida</h3>
-            <p>Combina várias técnicas com fallback</p>
-            <button onclick="copyMethod5()">Testar Método 5</button>
-            <div id="result5" class="result" style="display: none;"></div>
-        </div>
-        
-        <!-- Inspector de Clipboard -->
-        <div class="inspector">
-            <h3>🔍 Clipboard Inspector</h3>
-            <p>Cole aqui (Ctrl/Cmd+V) para ver o que foi copiado:</p>
-            <textarea id="clipboardInspector" placeholder="Cole aqui para inspecionar o conteúdo do clipboard..."></textarea>
-            <button onclick="clearInspector()">Limpar</button>
-            <button onclick="inspectClipboard()">Ler Clipboard</button>
+
+        <div class="content">
+            <div class="instructions">
+                <h3>📋 Como usar:</h3>
+                <ol>
+                    <li>Clique em "Copy to Figma" em qualquer componente abaixo</li>
+                    <li>Abra o Figma em outra aba</li>
+                    <li>Pressione Ctrl+V (ou Cmd+V no Mac) para colar</li>
+                    <li>O componente aparecerá no seu canvas!</li>
+                </ol>
+            </div>
+
+            <div class="component-gallery">
+                <!-- Botão -->
+                <div class="component-card">
+                    <div class="component-preview">
+                        <button class="button-preview">Click me</button>
+                    </div>
+                    <div class="component-info">
+                        <h3>Primary Button</h3>
+                        <p>Botão principal com estado hover e foco. Inclui auto-layout e constraints responsivos.</p>
+                        <button class="copy-button" onclick="copyButton()">
+                            📋 Copy to Figma
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card -->
+                <div class="component-card">
+                    <div class="component-preview">
+                        <div class="card-preview">
+                            <div class="card-title">Card Title</div>
+                            <div class="card-text">Este é um exemplo de card com título e descrição.</div>
+                        </div>
+                    </div>
+                    <div class="component-info">
+                        <h3>Card Component</h3>
+                        <p>Card responsivo com shadow e bordas arredondadas. Perfeito para dashboards.</p>
+                        <button class="copy-button" onclick="copyCard()">
+                            📋 Copy to Figma
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input -->
+                <div class="component-card">
+                    <div class="component-preview">
+                        <input class="input-preview" placeholder="Digite aqui..." />
+                    </div>
+                    <div class="component-info">
+                        <h3>Text Input</h3>
+                        <p>Input de texto com estados de foco e validação. Inclui variants para diferentes tipos.</p>
+                        <button class="copy-button" onclick="copyInput()">
+                            📋 Copy to Figma
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Badge -->
+                <div class="component-card">
+                    <div class="component-preview">
+                        <span class="badge-preview">New</span>
+                    </div>
+                    <div class="component-info">
+                        <h3>Status Badge</h3>
+                        <p>Badge para indicar status, notificações ou categorias. Múltiplas variações de cor.</p>
+                        <button class="copy-button" onclick="copyBadge()">
+                            📋 Copy to Figma
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Toggle -->
+                <div class="component-card">
+                    <div class="component-preview">
+                        <div class="toggle-preview"></div>
+                    </div>
+                    <div class="component-info">
+                        <h3>Toggle Switch</h3>
+                        <p>Switch interativo com animação. Estados on/off com variants para diferentes cores.</p>
+                        <button class="copy-button" onclick="copyToggle()">
+                            📋 Copy to Figma
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Avatar -->
+                <div class="component-card">
+                    <div class="component-preview">
+                        <div class="avatar-preview">JD</div>
+                    </div>
+                    <div class="component-info">
+                        <h3>User Avatar</h3>
+                        <p>Avatar de usuário com suporte a imagem ou iniciais. Múltiplos tamanhos disponíveis.</p>
+                        <button class="copy-button" onclick="copyAvatar()">
+                            📋 Copy to Figma
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <!-- Elementos ocultos para manipulação -->
-    <div class="hidden-elements">
-        <div id="hiddenCopy" contenteditable="true"></div>
-        <textarea id="hiddenTextarea"></textarea>
-    </div>
-    
-    <!-- Status -->
+
     <div id="status" class="status"></div>
-    
+
     <script>
-        // Variável global para armazenar o base64
-        let figmaBase64 = '';
-        
-        // Carregar o base64 do arquivo
-        async function loadBase64() {
-            if (figmaBase64) return figmaBase64;
-            
-            try {
-                const response = await fetch('card.base64.txt');
-                figmaBase64 = await response.text();
-                figmaBase64 = figmaBase64.trim(); // Remove quebras de linha
-                return figmaBase64;
-            } catch (error) {
-                console.error('Erro ao carregar base64:', error);
-                // Fallback com um base64 mínimo para teste
-                figmaBase64 = 'UEsDBAoAAAAAABZdWU8AAAAAAAAAAAAAAAAJAAAAX19NQUNPU1gvUEsBAhQAChQAAAAAFl1ZTwAAAAAAAAAAAAAAAAAJAAAAAAAAAAAAEADtQQAAAABfX01BQ09TWC9QSwUGAAAAAAEAAQA3AAAAJwAAAAAA';
-                return figmaBase64;
-            }
-        }
-        
-        // Função para mostrar status
         function showStatus(message, type = 'success') {
             const status = document.getElementById('status');
             status.textContent = message;
-            status.className = `status ${type} show`;
+            status.className = `status show ${type}`;
             
             setTimeout(() => {
                 status.classList.remove('show');
             }, 3000);
         }
-        
-        // Função para mostrar resultado
-        function showResult(methodId, message, type = 'success') {
-            const result = document.getElementById(`result${methodId}`);
-            result.textContent = message;
-            result.className = `result ${type}`;
-            result.style.display = 'block';
+
+        function addRippleEffect(button) {
+            button.classList.add('ripple');
+            setTimeout(() => button.classList.remove('ripple'), 600);
         }
-        
-        // Método 1: ClipboardItem com MIME customizado
-        async function copyMethod1() {
-            try {
-                const base64 = await loadBase64();
-                const figmaPayload = `<!--(figma)${base64}(/figma)-->`;
-                
-                // HTML estruturado como observado em sites funcionais
-                const html = `<div data-buffer="${figmaPayload}" contenteditable="true" style="white-space: pre;">Figma Component</div>`;
-                
-                const clipboardItem = new ClipboardItem({
-                    'text/html': new Blob([html], { type: 'text/html' }),
-                    'text/plain': new Blob([figmaPayload], { type: 'text/plain' }),
-                    'application/figma-node': new Blob([base64], { type: 'application/figma-node' })
-                });
-                
-                await navigator.clipboard.write([clipboardItem]);
-                showResult(1, '✅ Copiado com ClipboardItem + MIME customizado');
-                showStatus('Método 1: Copiado! Cole no Figma Desktop');
-                
-            } catch (error) {
-                showResult(1, `❌ Erro: ${error.message}`, 'error');
-                console.error('Método 1 erro:', error);
-            }
-        }
-        
-        // Método 2: execCommand com seleção
-        async function copyMethod2() {
-            try {
-                const base64 = await loadBase64();
-                const figmaPayload = `<!--(figma)${base64}(/figma)-->`;
-                
-                const hiddenDiv = document.getElementById('hiddenCopy');
-                hiddenDiv.innerHTML = `<span data-buffer="${figmaPayload}" contenteditable="true" style="white-space: pre;">Figma Component</span>`;
-                
-                // Selecionar o conteúdo
-                const range = document.createRange();
-                range.selectNodeContents(hiddenDiv);
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-                
-                // Copiar usando execCommand
-                const success = document.execCommand('copy');
-                selection.removeAllRanges();
-                
-                if (success) {
-                    showResult(2, '✅ Copiado com execCommand');
-                    showStatus('Método 2: Copiado! Cole no Figma Desktop');
-                } else {
-                    throw new Error('execCommand falhou');
-                }
-                
-            } catch (error) {
-                showResult(2, `❌ Erro: ${error.message}`, 'error');
-                console.error('Método 2 erro:', error);
-            }
-        }
-        
-        // Método 3: Multi-MIME com Data URLs
-        async function copyMethod3() {
-            try {
-                const base64 = await loadBase64();
-                const figmaPayload = `<!--(figma)${base64}(/figma)-->`;
-                const dataUrl = `data:application/figma-node;base64,${base64}`;
-                
-                const html = `
-                    <div data-buffer="${figmaPayload}" data-figma-url="${dataUrl}" contenteditable="true" style="white-space: pre;">
-                        <meta name="figma-component" content="${base64}">
-                        Figma Component
-                    </div>
-                `;
-                
-                const clipboardItem = new ClipboardItem({
-                    'text/html': new Blob([html], { type: 'text/html' }),
-                    'text/plain': new Blob([figmaPayload], { type: 'text/plain' }),
-                    'text/uri-list': new Blob([dataUrl], { type: 'text/uri-list' })
-                });
-                
-                await navigator.clipboard.write([clipboardItem]);
-                showResult(3, '✅ Copiado com Data URLs');
-                showStatus('Método 3: Copiado! Cole no Figma Desktop');
-                
-            } catch (error) {
-                showResult(3, `❌ Erro: ${error.message}`, 'error');
-                console.error('Método 3 erro:', error);
-            }
-        }
-        
-        // Método 4: Headers e Metadata Figma
-        async function copyMethod4() {
-            try {
-                const base64 = await loadBase64();
-                const figmaPayload = `<!--(figma)${base64}(/figma)-->`;
-                
-                // Simular estrutura mais complexa com metadados
-                const html = `
-                    <div 
-                        data-buffer="${figmaPayload}"
-                        data-figma-origin="figma.com"
-                        data-figma-type="component"
-                        data-figma-version="1.0"
-                        contenteditable="true" 
-                        style="white-space: pre; -webkit-user-select: all; user-select: all;"
-                    >
-                        <figma-component>${base64}</figma-component>
-                        Component copied from Figma
-                    </div>
-                `;
-                
-                // Adicionar ao DOM temporariamente
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-                tempDiv.style.position = 'absolute';
-                tempDiv.style.left = '-9999px';
-                document.body.appendChild(tempDiv);
-                
-                // Selecionar e copiar
-                const range = document.createRange();
-                range.selectNodeContents(tempDiv);
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-                
-                const success = document.execCommand('copy');
-                selection.removeAllRanges();
-                document.body.removeChild(tempDiv);
-                
-                if (success) {
-                    showResult(4, '✅ Copiado com metadata Figma');
-                    showStatus('Método 4: Copiado! Cole no Figma Desktop');
-                } else {
-                    throw new Error('Cópia falhou');
-                }
-                
-            } catch (error) {
-                showResult(4, `❌ Erro: ${error.message}`, 'error');
-                console.error('Método 4 erro:', error);
-            }
-        }
-        
-        // Método 5: Abordagem híbrida
-        async function copyMethod5() {
-            try {
-                const base64 = await loadBase64();
-                const figmaPayload = `<!--(figma)${base64}(/figma)-->`;
-                
-                // Tentar primeiro com ClipboardItem
-                if (navigator.clipboard && navigator.clipboard.write) {
-                    const html = `<span data-buffer="${figmaPayload}" contenteditable="true" style="white-space: pre;">Figma Component</span>`;
-                    const clipboardItem = new ClipboardItem({
-                        'text/html': new Blob([html], { type: 'text/html' }),
-                        'text/plain': new Blob([figmaPayload], { type: 'text/plain' })
-                    });
-                    
-                    await navigator.clipboard.write([clipboardItem]);
-                    showResult(5, '✅ Híbrido: ClipboardItem funcionou');
-                } else {
-                    // Fallback para execCommand
-                    const textarea = document.getElementById('hiddenTextarea');
-                    textarea.value = figmaPayload;
-                    textarea.select();
-                    
-                    const success = document.execCommand('copy');
-                    if (!success) throw new Error('Fallback falhou');
-                    
-                    showResult(5, '✅ Híbrido: Fallback execCommand');
-                }
-                
-                showStatus('Método 5: Copiado! Cole no Figma Desktop');
-                
-            } catch (error) {
-                showResult(5, `❌ Erro: ${error.message}`, 'error');
-                console.error('Método 5 erro:', error);
-            }
-        }
-        
-        // Função para limpar o inspector
-        function clearInspector() {
-            document.getElementById('clipboardInspector').value = '';
-        }
-        
-        // Função para tentar ler o clipboard
-        async function inspectClipboard() {
-            try {
-                if (navigator.clipboard && navigator.clipboard.readText) {
-                    const text = await navigator.clipboard.readText();
-                    document.getElementById('clipboardInspector').value = text;
-                    showStatus('Clipboard lido com sucesso');
-                } else {
-                    showStatus('Clipboard API não disponível', 'warning');
-                }
-            } catch (error) {
-                showStatus(`Erro ao ler clipboard: ${error.message}`, 'error');
-            }
-        }
-        
-        // Event listener para paste no inspector
-        document.getElementById('clipboardInspector').addEventListener('paste', (e) => {
+
+        function setCopiedState(button) {
+            const originalText = button.textContent;
+            button.textContent = '✅ Copiado!';
+            button.classList.add('copied');
+            
             setTimeout(() => {
-                const content = e.target.value;
-                if (content.includes('<!--(figma)')) {
-                    showStatus('✅ Conteúdo Figma detectado!', 'success');
-                } else {
-                    showStatus('ℹ️ Conteúdo colado (sem formato Figma)', 'warning');
-                }
-            }, 100);
-        });
-        
-        // Inicializar carregando o base64
-        loadBase64().then(() => {
-            console.log('Base64 carregado:', figmaBase64.substring(0, 50) + '...');
-        });
+                button.textContent = originalText;
+                button.classList.remove('copied');
+            }, 2000);
+        }
+
+        async function copyToFigmaClipboard(componentData, componentName) {
+            try {
+                // Preparar dados em múltiplos formatos
+                const clipboardItems = [
+                    new ClipboardItem({
+                        // Formato principal do Figma
+                        'application/x-figma-clipboard': new Blob([
+                            JSON.stringify(componentData)
+                        ], { type: 'application/x-figma-clipboard' }),
+                        
+                        // Formato JSON para debug
+                        'application/json': new Blob([
+                            JSON.stringify(componentData, null, 2)
+                        ], { type: 'application/json' }),
+                        
+                        // Texto vazio (padrão do Figma)
+                        'text/plain': new Blob([''], { type: 'text/plain' }),
+                        
+                        // Formato HTML para fallback
+                        'text/html': new Blob([
+                            `<div data-figma-component='${JSON.stringify(componentData)}'></div>`
+                        ], { type: 'text/html' })
+                    })
+                ];
+
+                await navigator.clipboard.write(clipboardItems);
+                showStatus(`${componentName} copiado! Cole no Figma com Ctrl+V`, 'success');
+                return true;
+
+            } catch (error) {
+                console.error('Erro ao copiar:', error);
+                showStatus(`Erro: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function copyButton() {
+            const button = event.target;
+            addRippleEffect(button);
+
+            const buttonData = {
+                id: "button-" + Date.now(),
+                name: "Primary Button",
+                type: "FRAME",
+                width: 120,
+                height: 40,
+                layoutMode: "HORIZONTAL",
+                primaryAxisAlignItems: "CENTER",
+                counterAxisAlignItems: "CENTER",
+                paddingLeft: 24,
+                paddingRight: 24,
+                paddingTop: 12,
+                paddingBottom: 12,
+                cornerRadius: 8,
+                fills: [{
+                    type: "SOLID",
+                    color: { r: 0, g: 0.48, b: 1, a: 1 }
+                }],
+                effects: [{
+                    type: "DROP_SHADOW",
+                    color: { r: 0, g: 0.48, b: 1, a: 0.3 },
+                    offset: { x: 0, y: 4 },
+                    radius: 8,
+                    spread: 0,
+                    visible: true,
+                    blendMode: "NORMAL"
+                }],
+                children: [{
+                    id: "text-" + Date.now(),
+                    name: "Button Text",
+                    type: "TEXT",
+                    characters: "Click me",
+                    fontSize: 16,
+                    fontName: {
+                        family: "Inter",
+                        style: "Medium"
+                    },
+                    fills: [{
+                        type: "SOLID",
+                        color: { r: 1, g: 1, b: 1, a: 1 }
+                    }],
+                    textAlignHorizontal: "CENTER",
+                    textAlignVertical: "CENTER"
+                }]
+            };
+
+            const success = await copyToFigmaClipboard(buttonData, "Primary Button");
+            if (success) setCopiedState(button);
+        }
+
+        async function copyCard() {
+            const button = event.target;
+            addRippleEffect(button);
+
+            const cardData = {
+                id: "card-" + Date.now(),
+                name: "Card Component",
+                type: "FRAME",
+                width: 300,
+                height: 150,
+                layoutMode: "VERTICAL",
+                primaryAxisAlignItems: "MIN",
+                counterAxisAlignItems: "STRETCH",
+                paddingLeft: 20,
+                paddingRight: 20,
+                paddingTop: 20,
+                paddingBottom: 20,
+                itemSpacing: 12,
+                cornerRadius: 12,
+                fills: [{
+                    type: "SOLID",
+                    color: { r: 1, g: 1, b: 1, a: 1 }
+                }],
+                strokes: [{
+                    type: "SOLID",
+                    color: { r: 0.9, g: 0.9, b: 0.9, a: 1 }
+                }],
+                strokeWeight: 1,
+                effects: [{
+                    type: "DROP_SHADOW",
+                    color: { r: 0, g: 0, b: 0, a: 0.1 },
+                    offset: { x: 0, y: 2 },
+                    radius: 8,
+                    spread: 0,
+                    visible: true,
+                    blendMode: "NORMAL"
+                }],
+                children: [
+                    {
+                        id: "title-" + Date.now(),
+                        name: "Card Title",
+                        type: "TEXT",
+                        characters: "Card Title",
+                        fontSize: 18,
+                        fontName: {
+                            family: "Inter",
+                            style: "Bold"
+                        },
+                        fills: [{
+                            type: "SOLID",
+                            color: { r: 0.2, g: 0.2, b: 0.2, a: 1 }
+                        }]
+                    },
+                    {
+                        id: "description-" + Date.now(),
+                        name: "Card Description",
+                        type: "TEXT",
+                        characters: "Este é um exemplo de card com título e descrição.",
+                        fontSize: 14,
+                        fontName: {
+                            family: "Inter",
+                            style: "Regular"
+                        },
+                        fills: [{
+                            type: "SOLID",
+                            color: { r: 0.4, g: 0.4, b: 0.4, a: 1 }
+                        }],
+                        textAutoResize: "WIDTH_AND_HEIGHT"
+                    }
+                ]
+            };
+
+            const success = await copyToFigmaClipboard(cardData, "Card Component");
+            if (success) setCopiedState(button);
+        }
+
+        async function copyInput() {
+            const button = event.target;
+            addRippleEffect(button);
+
+            const inputData = {
+                id: "input-" + Date.now(),
+                name: "Text Input",
+                type: "FRAME",
+                width: 250,
+                height: 44,
+                layoutMode: "HORIZONTAL",
+                primaryAxisAlignItems: "CENTER",
+                counterAxisAlignItems: "CENTER",
+                paddingLeft: 16,
+                paddingRight: 16,
+                paddingTop: 12,
+                paddingBottom: 12,
+                cornerRadius: 8,
+                fills: [{
+                    type: "SOLID",
+                    color: { r: 1, g: 1, b: 1, a: 1 }
+                }],
+                strokes: [{
+                    type: "SOLID",
+                    color: { r: 0.88, g: 0.88, b: 0.88, a: 1 }
+                }],
+                strokeWeight: 2,
+                children: [{
+                    id: "placeholder-" + Date.now(),
+                    name: "Placeholder Text",
+                    type: "TEXT",
+                    characters: "Digite aqui...",
+                    fontSize: 16,
+                    fontName: {
+                        family: "Inter",
+                        style: "Regular"
+                    },
+                    fills: [{
+                        type: "SOLID",
+                        color: { r: 0.6, g: 0.6, b: 0.6, a: 1 }
+                    }],
+                    layoutGrow: 1
+                }]
+            };
+
+            const success = await copyToFigmaClipboard(inputData, "Text Input");
+            if (success) setCopiedState(button);
+        }
+
+        async function copyBadge() {
+            const button = event.target;
+            addRippleEffect(button);
+
+            const badgeData = {
+                id: "badge-" + Date.now(),
+                name: "Status Badge",
+                type: "FRAME",
+                width: 60,
+                height: 24,
+                layoutMode: "HORIZONTAL",
+                primaryAxisAlignItems: "CENTER",
+                counterAxisAlignItems: "CENTER",
+                paddingLeft: 12,
+                paddingRight: 12,
+                paddingTop: 4,
+                paddingBottom: 4,
+                cornerRadius: 12,
+                fills: [{
+                    type: "SOLID",
+                    color: { r: 0.16, g: 0.65, b: 0.27, a: 1 }
+                }],
+                children: [{
+                    id: "badge-text-" + Date.now(),
+                    name: "Badge Text",
+                    type: "TEXT",
+                    characters: "New",
+                    fontSize: 12,
+                    fontName: {
+                        family: "Inter",
+                        style: "SemiBold"
+                    },
+                    fills: [{
+                        type: "SOLID",
+                        color: { r: 1, g: 1, b: 1, a: 1 }
+                    }],
+                    textAlignHorizontal: "CENTER"
+                }]
+            };
+
+            const success = await copyToFigmaClipboard(badgeData, "Status Badge");
+            if (success) setCopiedState(button);
+        }
+
+        async function copyToggle() {
+            const button = event.target;
+            addRippleEffect(button);
+
+            const toggleData = {
+                id: "toggle-" + Date.now(),
+                name: "Toggle Switch",
+                type: "FRAME",
+                width: 50,
+                height: 26,
+                cornerRadius: 13,
+                fills: [{
+                    type: "SOLID",
+                    color: { r: 0, g: 0.48, b: 1, a: 1 }
+                }],
+                children: [{
+                    id: "toggle-knob-" + Date.now(),
+                    name: "Toggle Knob",
+                    type: "ELLIPSE",
+                    width: 22,
+                    height: 22,
+                    x: 26,
+                    y: 2,
+                    fills: [{
+                        type: "SOLID",
+                        color: { r: 1, g: 1, b: 1, a: 1 }
+                    }],
+                    effects: [{
+                        type: "DROP_SHADOW",
+                        color: { r: 0, g: 0, b: 0, a: 0.2 },
+                        offset: { x: 0, y: 1 },
+                        radius: 2,
+                        spread: 0,
+                        visible: true,
+                        blendMode: "NORMAL"
+                    }]
+                }]
+            };
+
+            const success = await copyToFigmaClipboard(toggleData, "Toggle Switch");
+            if (success) setCopiedState(button);
+        }
+
+        async function copyAvatar() {
+            const button = event.target;
+            addRippleEffect(button);
+
+            const avatarData = {
+                id: "avatar-" + Date.now(),
+                name: "User Avatar",
+                type: "FRAME",
+                width: 50,
+                height: 50,
+                layoutMode: "HORIZONTAL",
+                primaryAxisAlignItems: "CENTER",
+                counterAxisAlignItems: "CENTER",
+                cornerRadius: 25,
+                fills: [{
+                    type: "SOLID",
+                    color: { r: 0.4, g: 0.5, b: 0.92, a: 1 }
+                }],
+                children: [{
+                    id: "avatar-text-" + Date.now(),
+                    name: "Avatar Initials",
+                    type: "TEXT",
+                    characters: "JD",
+                    fontSize: 18,
+                    fontName: {
+                        family: "Inter",
+                        style: "Bold"
+                    },
+                    fills: [{
+                        type: "SOLID",
+                        color: { r: 1, g: 1, b: 1, a: 1 }
+                    }],
+                    textAlignHorizontal: "CENTER",
+                    textAlignVertical: "CENTER"
+                }]
+            };
+
+            const success = await copyToFigmaClipboard(avatarData, "User Avatar");
+            if (success) setCopiedState(button);
+        }
+
+        // Verificar se o navegador suporta clipboard API
+        if (!navigator.clipboard) {
+            showStatus('⚠️ Clipboard API não suportada neste navegador', 'error');
+        }
     </script>
 </body>
 </html>
