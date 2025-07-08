@@ -24,3 +24,4 @@ window.copyToFigma = async function () {
     alert("❌ Erro: " + err.message);
   }
 }
+
