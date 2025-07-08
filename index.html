@@ -1,37 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Copy to Figma</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 2rem;
-      text-align: center;
-    }
-
-    button {
-      padding: 12px 24px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    #hidden-copy {
-      position: absolute;
-      left: -9999px;
-      white-space: pre;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embed Figma</title>
 </head>
 <body>
-  <h1>Copiar Componente para o Figma</h1>
-  <p>Clique no botão abaixo e cole (⌘+V / Ctrl+V) diretamente no Figma Desktop.</p>
-  <button onclick="copyToClipboard()">Copy to Figma</button>
-
-  <!-- Elemento oculto para garantir estrutura de fallback -->
-  <div id="hidden-copy" contenteditable="true"></div>
-
-  <script src="script.js"></script>
+  <h1>Visualização do Figma</h1>
+  <iframe 
+    src="https://www.figma.com/design/N70fO05S4DMBUo0BV5m6b4/component-shadcn?node-id=0-1&t=ERPCaieII1Rt3JWq-1" 
+    width="800" 
+    height="600" 
+    allowfullscreen>
+  </iframe>
 </body>
 </html>
